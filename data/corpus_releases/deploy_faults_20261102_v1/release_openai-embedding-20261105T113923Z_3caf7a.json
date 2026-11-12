@@ -1,0 +1,31 @@
+{
+  "status": "artifacts_validated",
+  "artifact_root": "builds",
+  "candidate": {
+    "build_id": "corpus-v4-openai-20261105T113923Z_3caf7a",
+    "artifact_directory": "openai-embedding-20261105T113923Z_3caf7a",
+    "chunks_sha256": "409db2e0ba0d202cbcd26ddc9ed645a09aee04aa37e0d9f48eb84653f778b1c7",
+    "vectors_sha256": "45b5333e6f40233b8441dd4920fe0713edc8ea2f6a0f9eb7e818e02926e72465",
+    "chunk_count": 53,
+    "embedding_model": "text-embedding-3-large",
+    "embedding_base_url": "https://api.openai.com/v1",
+    "embedding_dimension": 3072,
+    "retrieval_kind": "exact-cosine-bm25-v1"
+  },
+  "baseline": {
+    "build_id": "corpus-v3-deploy_faults_20261102_v1",
+    "artifact_directory": "candidate-cca9a6cd",
+    "chunks_sha256": "0257dae496623eee8072f660615144f132a8a32bcf2f0f103ad299a764c4873b",
+    "vectors_sha256": "c6304acac850a60d4a159701100a5af475ce4d1028666e8b239003613d2c06b4",
+    "chunk_count": 53,
+    "embedding_model": "text-embedding-v4",
+    "embedding_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "embedding_dimension": 1024,
+    "retrieval_kind": "exact-cosine-bm25-v1"
+  },
+  "catalog_publication": "not_published",
+  "migration_report": "builds\\openai-embedding-20261105T113923Z_3caf7a\\migration.json",
+  "all_document_vectors_regenerated": true,
+  "reused_old_document_vectors": 0,
+  "generation_model_calls": 0
+}

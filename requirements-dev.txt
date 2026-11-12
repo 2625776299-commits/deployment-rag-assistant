@@ -1,0 +1,3 @@
+-r requirements.txt
+pytest==9.1.1
+# Historical Chroma comparison tests/CLIs additionally need chromadb==1.5.9.

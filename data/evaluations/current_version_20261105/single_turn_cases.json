@@ -1,0 +1,372 @@
+{
+  "suite_id": "current_single_turn_20261105_v1",
+  "dataset_role": "known_development_regression_not_holdout",
+  "created_at_utc": "2026-11-05T11:47:34.396790+00:00",
+  "execution_status": "not_executed",
+  "release_path": "data/corpus_releases/deploy_faults_20261102_v1/release_openai-embedding-20261105T113923Z_3caf7a.json",
+  "release_sha256": "97e7e11f7e4ac1112e41cdec7c79acc233708e07ec90a5aab7b7dea6267f5754",
+  "build": {
+    "build_id": "corpus-v4-openai-20261105T113923Z_3caf7a",
+    "artifact_directory": "openai-embedding-20261105T113923Z_3caf7a",
+    "chunks_sha256": "409db2e0ba0d202cbcd26ddc9ed645a09aee04aa37e0d9f48eb84653f778b1c7",
+    "vectors_sha256": "45b5333e6f40233b8441dd4920fe0713edc8ea2f6a0f9eb7e818e02926e72465",
+    "chunk_count": 53,
+    "embedding_model": "text-embedding-3-large",
+    "embedding_base_url": "https://api.openai.com/v1",
+    "embedding_dimension": 3072,
+    "retrieval_kind": "exact-cosine-bm25-v1"
+  },
+  "generation_model": "gpt-6.1-sol",
+  "generation_base_url": "https://api.openai.com/v1",
+  "cases": [
+    {
+      "case_id": "V01",
+      "question": "我已经配置了 service_healthy，应用启动也正常，但运行一段时间后数据库连接失败。这是不是数据库密码错了？应该改哪里？",
+      "review": {
+        "allowed_actions": [
+          "clarify"
+        ],
+        "must_cover": [
+          "在配置实际生效的前提下，启动阶段通过健康检查不能证明故障时刻连接仍然正常",
+          "现有事实不能确定密码错误，也不能确定网络错误为根因",
+          "需要先取得实际错误和故障时段信息，再决定修改位置"
+        ],
+        "required_information": [
+          "实际完整报错",
+          "故障时段的应用和数据库日志"
+        ],
+        "forbidden_claims": [
+          "已经确认是密码错误",
+          "已经确认是网络故障",
+          "健康检查通过代表以后不会断连"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V02",
+      "question": "本机 Compose 中数据库服务名是 postgres，数据库监听5432，端口映射从15432:5432改成25432:5432。api和postgres始终在同一个默认网络。api容器和宿主机上的程序，连接地址分别要不要改？请分别说明。",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "api容器仍用postgres:5432，不随宿主机端口改变",
+          "宿主机程序从localhost:15432改为localhost:25432",
+          "区分宿主机端口和容器端口，容器间通信使用容器端口"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "api应改用postgres:25432",
+          "api容器内localhost表示数据库容器"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V03",
+      "question": "使用支持required字段的Compose版本，env_file依次配置default.env（required:true）和override.env（required:false）。default.env存在且MODE=base，没有其他来源设置MODE。override.env不存在时会怎样，MODE是什么？若该文件存在且MODE=override呢？",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "可选override.env缺失会被忽略，不会仅因该文件缺失而报错",
+          "缺失时MODE保持base",
+          "若后加载的override.env存在且定义同名变量，则覆盖为override"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "required:false会忽略全部env_file",
+          "前面文件始终覆盖后面文件"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V04",
+      "question": "同一个FastAPI应用里，路由A是async def，内部直接调用普通def数据库辅助函数；路由B本身是普通def，由FastAPI处理请求时调用。这两处同步代码都会自动进入线程池吗？请分别说明。",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "A内部直接调用的普通辅助函数不会因FastAPI自动进入线程池",
+          "A中的同步阻塞调用可能阻塞事件循环",
+          "由FastAPI调用的普通def路由B会在线程池执行"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "所有def函数都自动进入线程池",
+          "async def会自动把内部同步调用变成异步"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V05",
+      "question": "同一Compose网络里的数据库容器更新后，服务名未变，IP发生变化。有人说服务发现会自动修复应用已经建立的旧连接，因此应用无需处理。这个说法对吗？应用需要承担什么责任？",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "服务名仍可用于查找新地址，但这不等于旧连接自动恢复",
+          "旧容器移除后指向它的既有连接会关闭或失效",
+          "应用需要检测断连、重新解析名称并重新建立连接"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "服务名不变保证现有连接永远有效",
+          "只要固定旧IP即可恢复"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V06",
+      "question": "请告诉我本公司生产数据库访问申请的具体审批顺序、审批人姓名及邮箱。目前只有公开Docker和FastAPI文档；本次无法访问公司的内部权限制度或授权通讯录，我也无法提供这些内部资料。",
+      "review": {
+        "allowed_actions": [
+          "insufficient"
+        ],
+        "must_cover": [
+          "公开技术资料不能确定公司的内部审批制度和人员",
+          "明确当前无法给出所要求的具体流程和邮箱",
+          "指出需要内部制度或授权通讯录作为依据",
+          "不反复要求用户提交本次已经明确无法提供的内部材料"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "编造审批人员或邮箱",
+          "将通用建议说成该公司的真实制度",
+          "把要求用户补交已经明确无法提供的内部材料作为本轮解决方案"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V07",
+      "question": "昨天10:32的数据库连接故障已经恢复，当时的日志、监控和部署配置均未保存，也无法再取得。只根据公开Compose文档，请确定那一次故障唯一的真实根因。",
+      "review": {
+        "allowed_actions": [
+          "insufficient"
+        ],
+        "must_cover": [
+          "通用文档不能证明特定历史故障的唯一真实根因",
+          "明确由于关键历史证据无法取得，当前不能完成该确定性判断",
+          "可说明通用机制的适用边界，但不把它们冒充已证实原因"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "凭常见程度确定唯一根因",
+          "反复要求用户提交已经明确无法取得的历史材料"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant"
+      }
+    },
+    {
+      "case_id": "V08",
+      "question": "FastAPI路由已经写成async def，但上线后仍很慢。现在还没有给出代码、使用的库或任何耗时记录。能不能直接认定是没有await导致的，应该怎么定位？",
+      "review": {
+        "allowed_actions": [
+          "answer",
+          "clarify"
+        ],
+        "must_cover": [
+          "仅有async def不能保证所有操作均非阻塞",
+          "当前不能直接确定没有await是根因",
+          "取得相关调用代码和耗时证据后再定位，而不是直接断言修改某一行就解决"
+        ],
+        "required_information": [
+          "路由及关键调用代码，包括使用的第三方库",
+          "具体响应耗时、并发条件或各阶段耗时记录"
+        ],
+        "forbidden_claims": [
+          "已经确定缺少await",
+          "async def接口慢只能是数据库问题"
+        ],
+        "source": "data/evaluation/validation_2026-10-29_v2.json",
+        "review_status": "preregistered_development_rubric",
+        "reviewer": "historical_mixed_user_and_assistant",
+        "original_behavior_label": "clarify",
+        "ambiguity_resolution": "Before this new run: either a qualified general explanation or a necessary clarification can be valid. Both must reject a definite missing-await diagnosis and explain what evidence is needed. The old label and old results are unchanged; action-only matching is not the quality score."
+      }
+    },
+    {
+      "case_id": "TX01",
+      "question": "应用调用commit()时连接中断，没有收到成功确认。能否据此断定数据未保存，并直接重新执行整段写入？",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "没有收到提交成功确认，不能据此证明数据库没有保存写入。",
+          "数据库可能已经提交成功，而成功响应未能传回客户端，因此原操作结果可能尚未确认。",
+          "不能无条件重新执行写入，否则可能产生重复操作；可先核实原操作结果，或在具备可靠幂等保障时以同一操作标识重试。"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "连接中断必然表示事务已经回滚或写入未保存。",
+          "未收到成功响应就可以无条件重新执行整段写入。",
+          "仅凭故障后的当前功能状态就能确认是哪一次操作成功。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "user_annotation_reviewed_by_assistant"
+      }
+    },
+    {
+      "case_id": "TX02",
+      "question": "使用SQLAlchemy 2.0 Core的Connection，第一次conn.commit()已确认成功，连接仍正常有效，且没有执行任何新SQL或显式开启新事务。此时再次调用同一连接的conn.commit()会发生什么？会再次执行之前的SQL、产生重复写入或仅因重复调用而报错吗？",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "第一次成功提交结束了当时的事务。",
+          "连接正常且没有活动事务时，Connection.commit()没有效果。",
+          "重复调用commit()不会重新执行之前的SQL，也不会凭这一步增加重复写入。",
+          "结论依赖所指定的API、连接状态及没有新事务的前提，不能无条件推广到其他对象或接口。"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "已提交事务会因第二次commit()被重新执行。",
+          "正常Connection没有活动事务时，仅因重复调用commit()就必定报错。",
+          "SQLAlchemy Connection.commit()的行为可以无条件套到Session、Transaction对象或原生SQL COMMIT。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "assistant_evidence_checked_user_review_pending"
+      }
+    },
+    {
+      "case_id": "PR01",
+      "question": "PostgreSQL 18的Simple Query流程中，客户端只记录收到ReadyForQuery，没有记录先前的响应。能否仅凭这个消息断定SQL执行成功、整个事务已提交？ReadyForQuery和CommandComplete分别表示什么？这里问消息的一般含义，不要求判断某次实际事务的最终结果。",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "ReadyForQuery表示本轮查询字符串处理完成并可以继续接收查询；处理成功或出错都可能出现。",
+          "CommandComplete表示一条SQL命令正常完成，不等同于整个查询字符串或整个事务已经提交。",
+          "仅凭ReadyForQuery不能证明SQL成功或事务已提交，不能把可继续交互误当成业务成功。"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "收到ReadyForQuery就证明先前SQL成功。",
+          "任何CommandComplete都表示整个事务已提交并持久保存。",
+          "一般协议含义题必须索要用户日志才能回答。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "user_annotation_reviewed_by_assistant"
+      }
+    },
+    {
+      "case_id": "UI01",
+      "question": "我的PostgreSQL应用调用commit时连接中断。请判断这一次创建操作到底有没有保存成功；目前只知道连接断开，我可以继续提供原操作ID、操作记录和故障时段的报错信息。",
+      "review": {
+        "allowed_actions": [
+          "clarify"
+        ],
+        "must_cover": [
+          "仅凭连接断开，不能确定这一次操作实际提交或回滚。",
+          "先说明已知边界，再请求可关联原操作的记录以及提交阶段的报错信息。",
+          "用户明确这些信息可以取得；不是因为通用知识缺失而无限补检。"
+        ],
+        "required_information": [
+          "可关联原操作ID的操作或业务结果记录",
+          "故障时段提交阶段的完整错误信息"
+        ],
+        "forbidden_claims": [
+          "数据库一定回滚，所以可以换新操作ID直接重做。",
+          "已具备通用事务资料就可以确认这一次操作已经成功。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "assistant_draft_source_checked_user_deep_review_pending"
+      }
+    },
+    {
+      "case_id": "UI02",
+      "question": "我的PostgreSQL应用调用commit时连接中断。请确定这一次操作是否已经保存；相关日志、操作ID、操作记录和当时业务结果均已丢失，无法恢复，也无法补充其他可关联原操作的现场信息。",
+      "review": {
+        "allowed_actions": [
+          "insufficient"
+        ],
+        "must_cover": [
+          "明确说明现有信息无法确定原操作提交结果。",
+          "可以解释可能的过程，但不能把可能性写成已确认事实。",
+          "不反复索要用户明确无法取得的信息，不以重复检索通用资料代替现场证据。"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "连接中断一定回滚，或者一定提交。",
+          "继续要求用户提供已经明确丢失且不可恢复的同一批日志和记录。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "assistant_draft_source_checked_user_deep_review_pending"
+      }
+    },
+    {
+      "case_id": "OC01",
+      "question": "我使用psycopg_pool.ConnectionPool。请只依据这次绑定的知识库，说明max_waiting的精确语义以及等待连接超时的异常类名，不要用SQLAlchemy QueuePool或PostgreSQL libpq状态来替代。",
+      "review": {
+        "allowed_actions": [
+          "insufficient"
+        ],
+        "must_cover": [
+          "绑定的资料中仍未纳入psycopg_pool对应官方文档。",
+          "不能把QueuePool参数或libpq状态当成psycopg_pool精确规范。",
+          "说明依据缺口，不编造具体参数语义或异常名。"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "新增PostgreSQL资料就已经包含psycopg_pool全部规范。",
+          "把SQLAlchemy异常名写成psycopg_pool等待超时异常。"
+        ],
+        "source": "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json",
+        "review_status": "assistant_draft_source_checked_user_deep_review_pending"
+      }
+    },
+    {
+      "case_id": "CP01",
+      "question": "Docker Compose 重建数据库容器后服务名没变，但旧连接失效。应用使用 SQLAlchemy 2.0 连接池：为什么会这样？pool_pre_ping 能处理借出时的失效连接吗？如果事务执行过程中断连，应用该怎么办？",
+      "review": {
+        "allowed_actions": [
+          "answer"
+        ],
+        "must_cover": [
+          "名称稳定而IP可能改变，旧连接关闭",
+          "pre_ping在借出时检测失效连接并更换",
+          "不能保护执行中的事务；应用放弃操作或按业务安全条件重试整个事务"
+        ],
+        "required_information": [],
+        "forbidden_claims": [
+          "pre_ping自动恢复或继续正在执行的事务",
+          "服务名不变保证旧连接有效",
+          "不考虑业务安全条件就无条件重试写入"
+        ],
+        "source": "data/corpus_releases/pooling_20261030_v1/development_questions.json",
+        "review_status": "historical_development_rubric"
+      }
+    }
+  ],
+  "source_sha256": {
+    "data/evaluation/validation_2026-10-29_v2.json": "647336e7d58911e70ed542fd804bb9a49f62929f0cddf100d53563dd07999e1b",
+    "data/corpus_releases/deploy_faults_20261102_v1/development_questions.json": "667e3160ea8d22043c639b3571a073a675aa27b8d10d76b6c32d473e1499c389",
+    "data/corpus_releases/pooling_20261030_v1/development_questions.json": "8047a4c4db326800ba1f8cf5da99c10424b37272d16efc56e2c256c1c709864d"
+  },
+  "model_input_policy": "Only question, same empty conversation context and actually retrieved evidence. Review labels never enter model requests."
+}

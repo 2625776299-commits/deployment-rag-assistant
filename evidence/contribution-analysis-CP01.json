@@ -1,0 +1,66 @@
+{
+  "case_id": "CP01",
+  "question": "Docker Compose 重建数据库容器后服务名没变，但旧连接失效。应用使用 SQLAlchemy 2.0 连接池：为什么会这样？pool_pre_ping 能处理借出时的失效连接吗？如果事务执行过程中断连，应用该怎么办？",
+  "initial_candidates": [
+    {
+      "rank": 1,
+      "chunk_id": "SA1-sbaad4aab:003"
+    },
+    {
+      "rank": 2,
+      "chunk_id": "SA_CONN_LIFECYCLE-s2a62da54-5c9472c2:002"
+    },
+    {
+      "rank": 3,
+      "chunk_id": "E2-sd823bcc5-da07316f:002"
+    },
+    {
+      "rank": 4,
+      "chunk_id": "N3-sd823bcc5-9274fa1e:000"
+    },
+    {
+      "rank": 5,
+      "chunk_id": "E2-sd823bcc5-da07316f:001"
+    }
+  ],
+  "A_evidence": [
+    "SA1-sbaad4aab:003",
+    "SA_CONN_LIFECYCLE-s2a62da54-5c9472c2:002",
+    "E2-sd823bcc5-da07316f:002"
+  ],
+  "B_evidence_origins": [
+    {
+      "chunk_id": "N3-sd823bcc5-9274fa1e:000",
+      "initial_rank": 4,
+      "returned_by_supplement": false,
+      "section_id": "N3"
+    },
+    {
+      "chunk_id": "SA1-sbaad4aab:001",
+      "initial_rank": null,
+      "returned_by_supplement": true,
+      "section_id": "SA1"
+    },
+    {
+      "chunk_id": "SA1-sbaad4aab:003",
+      "initial_rank": 1,
+      "returned_by_supplement": false,
+      "section_id": "SA1"
+    }
+  ],
+  "B_supplementary_retrievals": 1,
+  "observations": [
+    "The Docker lifecycle passage was already at initial rank four.",
+    "The checkout pre-ping passage was absent from the initial pool and arrived through supplementation.",
+    "The transaction-loss passage was already at initial rank one.",
+    "Selection and supplementation both changed the outcome; this pair does not isolate the effect of either alone."
+  ],
+  "remaining_caveat": "The final answer does not explicitly describe business-safety conditions for whole-transaction retry.",
+  "user_review": {
+    "status": "evidence_attribution_and_ablation_design_understood",
+    "answer": "旧连接失效解释来自初检第4位重新选证；pre_ping来自补检。单独验证补检时两组保持相同初始候选、评价器和选证策略，只有B允许补检。",
+    "scope": "Attribution and experiment design only; not a completed semantic score for all CP01 answer requirements.",
+    "clarification": "Same strategy and parameters do not require identical execution counts; supplementation naturally adds reevaluation and may alter generation or stopping. A must not be forced to invent an answer.",
+    "new_ablation_execution_requested": false
+  }
+}

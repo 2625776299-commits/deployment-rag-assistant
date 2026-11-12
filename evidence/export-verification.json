@@ -1,0 +1,39 @@
+{
+  "checked_on": "2026-11-12",
+  "checked_at_utc": "2026-11-12T10:33:13.266514+00:00",
+  "scope": "Public source subset only; no new model or database calls.",
+  "offline_tests": {
+    "command": "python -m pytest tests -q",
+    "passed": 297,
+    "subtests_passed": 212,
+    "skipped_native_postgresql_tests": 90,
+    "failures": 0,
+    "elapsed_seconds": 3.1,
+    "environment": "Windows, CPython 3.13.9"
+  },
+  "artifact_integrity": {
+    "status": "passed",
+    "chunks": 53,
+    "embedding_dimensions": 3072,
+    "source_files_checked": 111,
+    "checks": [
+      "release hashes",
+      "chunk/vector alignment",
+      "embedding identity",
+      "exported source SHA-256"
+    ]
+  },
+  "paired_preflight": {
+    "status": "offline_preflight_passed",
+    "cases": 15,
+    "chunks": 53,
+    "model_calls": 0
+  },
+  "record_viewer": {
+    "status": "passed",
+    "selected_turn": "M4",
+    "model_calls": 0
+  },
+  "historical_records": "2026-11-05 results remain historical; not rerun during public export.",
+  "profile_adaptation": "One old migration test requiring developer absolute paths was replaced by a shipped-release load test. Historical Chroma comparison tests are excluded from this public subset."
+}

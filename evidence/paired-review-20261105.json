@@ -1,0 +1,758 @@
+{
+  "status": "assistant_rubric_review_completed_with_known_limits",
+  "case_count": 15,
+  "arm_count": 30,
+  "source_run": "live_20261105T115515Z_8q0uh_5w",
+  "application_revision": "before terminal-reply closeout fix",
+  "rubric_frozen_before_generation": true,
+  "user_individual_scoring_claim": false,
+  "independent_holdout": false,
+  "semantic_accuracy_claim": null,
+  "rows": [
+    {
+      "case_id": "V01",
+      "arm": "A_rrf_direct",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "在配置实际生效的前提下，启动阶段通过健康检查不能证明故障时刻连接仍然正常",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "现有事实不能确定密码错误，也不能确定网络错误为根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "需要先取得实际错误和故障时段信息，再决定修改位置",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Correctly declines a password diagnosis and explains startup healthcheck scope. Requests full error and deployment context; does not explicitly request both fault-period application and database logs.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V01",
+      "arm": "B_coverage_flow",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "在配置实际生效的前提下，启动阶段通过健康检查不能证明故障时刻连接仍然正常",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "现有事实不能确定密码错误，也不能确定网络错误为根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "需要先取得实际错误和故障时段信息，再决定修改位置",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Preserves the startup-scope finding and asks for actual errors/logs and client configuration. Necessary information requests differ from A; one model request still takes longer. No supplementation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V02",
+      "arm": "A_rrf_direct",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "api容器仍用postgres:5432，不随宿主机端口改变",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "宿主机程序从localhost:15432改为localhost:25432",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "区分宿主机端口和容器端口，容器间通信使用容器端口",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers container postgres:5432 versus host localhost:25432; does not claim a live connection was verified.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V02",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "api容器仍用postgres:5432，不随宿主机端口改变",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "宿主机程序从localhost:15432改为localhost:25432",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "区分宿主机端口和容器端口，容器间通信使用容器端口",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers the same address distinctions using one selected passage; no missing required point observed in the main answer. No supplementation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V03",
+      "arm": "A_rrf_direct",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "可选override.env缺失会被忽略，不会仅因该文件缺失而报错",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "缺失时MODE保持base",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "若后加载的override.env存在且定义同名变量，则覆盖为override",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers optional-file omission, MODE=base and later-file override to MODE=override.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V03",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "可选override.env缺失会被忽略，不会仅因该文件缺失而报错",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "缺失时MODE保持base",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "若后加载的override.env存在且定义同名变量，则覆盖为override",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers the same three points with one passage; extra evaluation did not establish an answer-quality gain in this observation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V04",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "A内部直接调用的普通辅助函数不会因FastAPI自动进入线程池",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "A中的同步阻塞调用可能阻塞事件循环",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "由FastAPI调用的普通def路由B会在线程池执行",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Top-three evidence omits the utility-function rule at rank four. The response declines to determine the directly called helper behavior, leaving the question incomplete.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V04",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "A内部直接调用的普通辅助函数不会因FastAPI自动进入线程池",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "A中的同步阻塞调用可能阻塞事件循环",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "由FastAPI调用的普通def路由B会在线程池执行",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Selects the rank-four utility-function rule and distinguishes helper calls from framework-managed sync routes. Does not explicitly state the rubric point about synchronous blocking work potentially blocking the event loop. Benefit is selection, not supplementation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V05",
+      "arm": "A_rrf_direct",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "服务名仍可用于查找新地址，但这不等于旧连接自动恢复",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "旧容器移除后指向它的既有连接会关闭或失效",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "应用需要检测断连、重新解析名称并重新建立连接",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers stable name, invalid old connection and application detection/resolution/reconnection responsibilities.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V05",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "服务名仍可用于查找新地址，但这不等于旧连接自动恢复",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "旧容器移除后指向它的既有连接会关闭或失效",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "应用需要检测断连、重新解析名称并重新建立连接",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Covers the same main requirements using N3 alone. No supplementation or new necessary fact established versus A.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V06",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "公开技术资料不能确定公司的内部审批制度和人员",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "明确当前无法给出所要求的具体流程和邮箱",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "指出需要内部制度或授权通讯录作为依据",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不反复要求用户提交本次已经明确无法提供的内部材料",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Declines to invent internal approvers or email addresses and acknowledges unavailable internal records.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V06",
+      "arm": "B_coverage_flow",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "公开技术资料不能确定公司的内部审批制度和人员",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "明确当前无法给出所要求的具体流程和邮箱",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "指出需要内部制度或授权通讯录作为依据",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不反复要求用户提交本次已经明确无法提供的内部材料",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Correctly ends insufficient without asking for unavailable records. Repeated punctuation is a rendering limitation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V07",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "通用文档不能证明特定历史故障的唯一真实根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "明确由于关键历史证据无法取得，当前不能完成该确定性判断",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "可说明通用机制的适用边界，但不把它们冒充已证实原因",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Refuses unique historical root-cause attribution, labels readiness as a possibility rather than a proven cause and does not demand lost records.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V07",
+      "arm": "B_coverage_flow",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "通用文档不能证明特定历史故障的唯一真实根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "明确由于关键历史证据无法取得，当前不能完成该确定性判断",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "可说明通用机制的适用边界，但不把它们冒充已证实原因",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Ends insufficient without supplementation or repeated requests for lost records; public explanation is shorter and has repeated punctuation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V08",
+      "arm": "A_rrf_direct",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "仅有async def不能保证所有操作均非阻塞",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "当前不能直接确定没有await是根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "取得相关调用代码和耗时证据后再定位，而不是直接断言修改某一行就解决",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Gives a qualified async explanation and requests relevant code/libraries and timing evidence; does not assert missing await as the root cause.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "V08",
+      "arm": "B_coverage_flow",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "仅有async def不能保证所有操作均非阻塞",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "当前不能直接确定没有await是根因",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "取得相关调用代码和耗时证据后再定位，而不是直接断言修改某一行就解决",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Preserves grounded async findings and requests code and timings. Appropriate clarification under the preregistered ambiguity rule; no supplementation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "TX01",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "没有收到提交成功确认，不能据此证明数据库没有保存写入。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "数据库可能已经提交成功，而成功响应未能传回客户端，因此原操作结果可能尚未确认。",
+          "answer_coverage": "partial"
+        },
+        {
+          "point": "不能无条件重新执行写入，否则可能产生重复操作；可先核实原操作结果，或在具备可靠幂等保障时以同一操作标识重试。",
+          "answer_coverage": "partial"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Declines to equate lost confirmation with failure or safe replay, but does not give the complete confirmation-loss and reliable retry explanation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "TX01",
+      "arm": "B_coverage_flow",
+      "observed_action": "stopped",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "没有收到提交成功确认，不能据此证明数据库没有保存写入。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "数据库可能已经提交成功，而成功响应未能传回客户端，因此原操作结果可能尚未确认。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "不能无条件重新执行写入，否则可能产生重复操作；可先核实原操作结果，或在具备可靠幂等保障时以同一操作标识重试。",
+          "answer_coverage": "missing"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Detects both gaps and supplements once; selects generic idempotency evidence but still reports missing commit/acknowledgement support. Stops after two evaluations with no final answer. Do not treat a retrieved AWS passage as end-to-end success.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "TX02",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "第一次成功提交结束了当时的事务。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "连接正常且没有活动事务时，Connection.commit()没有效果。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "重复调用commit()不会重新执行之前的SQL，也不会凭这一步增加重复写入。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "结论依赖所指定的API、连接状态及没有新事务的前提，不能无条件推广到其他对象或接口。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Selected lifecycle passages support transaction boundaries but omit the explicit no-active-transaction commit rule; response is incomplete.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "TX02",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "第一次成功提交结束了当时的事务。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "连接正常且没有活动事务时，Connection.commit()没有效果。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "重复调用commit()不会重新执行之前的SQL，也不会凭这一步增加重复写入。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "结论依赖所指定的API、连接状态及没有新事务的前提，不能无条件推广到其他对象或接口。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Selects SA_CONN_COMMIT at initial rank five and lifecycle support, then answers no-op/no replay/no duplicate writes/no error merely from repeating commit under the stated conditions. No supplementary retrieval.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "PR01",
+      "arm": "A_rrf_direct",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "ReadyForQuery表示本轮查询字符串处理完成并可以继续接收查询；处理成功或出错都可能出现。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "CommandComplete表示一条SQL命令正常完成，不等同于整个查询字符串或整个事务已经提交。",
+          "answer_coverage": "partial"
+        },
+        {
+          "point": "仅凭ReadyForQuery不能证明SQL成功或事务已提交，不能把可继续交互误当成业务成功。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Explains ReadyForQuery is not success/commit proof and separates query-string from command completion. CommandComplete wording says completion without explicitly retaining the source qualifier normally; review that precision.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "PR01",
+      "arm": "B_coverage_flow",
+      "observed_action": "stopped",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "ReadyForQuery表示本轮查询字符串处理完成并可以继续接收查询；处理成功或出错都可能出现。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "CommandComplete表示一条SQL命令正常完成，不等同于整个查询字符串或整个事务已经提交。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "仅凭ReadyForQuery不能证明SQL成功或事务已提交，不能把可继续交互误当成业务成功。",
+          "answer_coverage": "missing"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Finds SQL success and message-definition support, but requests additional transaction-boundary proof twice and stops without a public answer. Whether this is a genuine support gap or an overstrict evidence requirement needs source-level review.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "UI01",
+      "arm": "A_rrf_direct",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "仅凭连接断开，不能确定这一次操作实际提交或回滚。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "先说明已知边界，再请求可关联原操作的记录以及提交阶段的报错信息。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "用户明确这些信息可以取得；不是因为通用知识缺失而无限补检。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Does not infer this operation outcome; asks for the original operation ID/records and incident error evidence.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "UI01",
+      "arm": "B_coverage_flow",
+      "observed_action": "clarify",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "仅凭连接断开，不能确定这一次操作实际提交或回滚。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "先说明已知边界，再请求可关联原操作的记录以及提交阶段的报错信息。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "用户明确这些信息可以取得；不是因为通用知识缺失而无限补检。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Keeps the general commit finding distinct from this operation outcome and asks for available operation-linked evidence; no supplementation.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "UI02",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "明确说明现有信息无法确定原操作提交结果。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "可以解释可能的过程，但不能把可能性写成已确认事实。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不反复索要用户明确无法取得的信息，不以重复检索通用资料代替现场证据。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Acknowledges irreversible evidence loss and leaves this original operation outcome unknown, without demanding lost information or substituting a later test.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "UI02",
+      "arm": "B_coverage_flow",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "明确说明现有信息无法确定原操作提交结果。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "可以解释可能的过程，但不能把可能性写成已确认事实。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不反复索要用户明确无法取得的信息，不以重复检索通用资料代替现场证据。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Ends insufficient and does not demand unavailable original-operation evidence; repeated punctuation remains.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "OC01",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "绑定的资料中仍未纳入psycopg_pool对应官方文档。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不能把QueuePool参数或libpq状态当成psycopg_pool精确规范。",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "说明依据缺口，不编造具体参数语义或异常名。",
+          "answer_coverage": "covered"
+        }
+      ],
+      "verdict": "main_rubric_met",
+      "full_rubric_met_in_this_assistant_review": true,
+      "notes": "Declines to substitute SQLAlchemy QueuePool semantics or libpq state for absent psycopg_pool definitions.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "OC01",
+      "arm": "B_coverage_flow",
+      "observed_action": "stopped",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "绑定的资料中仍未纳入psycopg_pool对应官方文档。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "不能把QueuePool参数或libpq状态当成psycopg_pool精确规范。",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "说明依据缺口，不编造具体参数语义或异常名。",
+          "answer_coverage": "missing"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Supplements once but still lacks the requested library evidence, then exposes generic stopped rather than a useful insufficient-evidence explanation. No invented API details, but the user request remains unanswered.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "CP01",
+      "arm": "A_rrf_direct",
+      "observed_action": "insufficient",
+      "action_appropriate": false,
+      "point_reviews": [
+        {
+          "point": "名称稳定而IP可能改变，旧连接关闭",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "pre_ping在借出时检测失效连接并更换",
+          "answer_coverage": "missing"
+        },
+        {
+          "point": "不能保护执行中的事务；应用放弃操作或按业务安全条件重试整个事务",
+          "answer_coverage": "partial"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Top-three selection lacks Docker lifecycle and checkout pre-ping evidence, so it cannot answer all three parts.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    },
+    {
+      "case_id": "CP01",
+      "arm": "B_coverage_flow",
+      "observed_action": "answer",
+      "action_appropriate": true,
+      "point_reviews": [
+        {
+          "point": "名称稳定而IP可能改变，旧连接关闭",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "pre_ping在借出时检测失效连接并更换",
+          "answer_coverage": "covered"
+        },
+        {
+          "point": "不能保护执行中的事务；应用放弃操作或按业务安全条件重试整个事务",
+          "answer_coverage": "partial"
+        }
+      ],
+      "verdict": "incomplete_or_unanswered",
+      "full_rubric_met_in_this_assistant_review": false,
+      "notes": "Selects existing N3 and supplements checkout pre-ping evidence, then answers the three main parts. The business-safety qualification for whole-transaction retries is not explicit; preserve that rubric caveat.",
+      "scope": "Assistant semantic review of this one development output; not user-reviewed ground truth or independent holdout."
+    }
+  ],
+  "interpretation": [
+    "Full question coverage and evidence selection improvements are separate dimensions.",
+    "V04 helper-call distinction improves in B but the event-loop risk point remains unstated.",
+    "CP01 B covers the three main topics but omits the explicit business-safety qualification for retry.",
+    "A PR01 CommandComplete wording does not explicitly retain the normal/successful qualifier.",
+    "An insufficient answer can be safe but still fail the full-answer rubric.",
+    "V01 requests differ from the preferred log list; main uncertainty and useful next-information requests are covered, without assuming exact wording is mandatory.",
+    "Do not replace this run with later repaired or randomly different outputs."
+  ]
+}

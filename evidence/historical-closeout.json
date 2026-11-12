@@ -1,0 +1,33 @@
+{
+  "status": "resume_demo_version_complete_with_documented_limits",
+  "completed_at_utc": "2026-11-05T12:54:26.595224+00:00",
+  "application_code_frozen_during_live_verification": true,
+  "remaining_limits": [
+    "TX01提交确认/安全重试的关键材料召回不足，当前明确返回insufficient。",
+    "只有53片段的小型开发语料，不宣称大规模检索或生产准确率。",
+    "源引用合法不等于模型语义正确；仍可能误解需求、抽取遗漏或生成冗长回答。",
+    "外部API延迟与连接失败仍可能发生；只记录本次观察。",
+    "本地token演示鉴权不等于完整生产账号系统；无ANN索引或训练版Self-RAG。"
+  ],
+  "offline": {
+    "passed": 311,
+    "subtests_passed": 217,
+    "skipped_native_pg_in_this_command": 90,
+    "skipped_optional_chroma_modules": 2
+  },
+  "native_pg_http": {
+    "passed": 90,
+    "failed": 0,
+    "skipped": 0
+  },
+  "multiturn_execution": {
+    "cases": 10,
+    "turns": 30,
+    "request_failures": 0,
+    "generation_attempts": 115,
+    "embedding_attempts": 30,
+    "state_checks_passed": 118,
+    "overall_accuracy_claim": false
+  },
+  "sanitization": "Selected result fields only; local paths, session/process identifiers and server details omitted."
+}

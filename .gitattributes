@@ -1,0 +1,3 @@
+# Preserve exported source and evidence bytes for SHA-256 verification.
+# Disabling newline conversion does not disable Git's normal text diffs.
+* -text

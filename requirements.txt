@@ -1,0 +1,9 @@
+# Tested runtime: CPython 3.13.9 on Windows, using the pinned corpus profile.
+fastapi==0.135.2
+uvicorn==0.42.0
+pydantic==2.12.5
+httpx==0.28.1
+openai==3.8.0
+python-dotenv==1.2.2
+psycopg[binary]==3.3.6
+PyYAML==6.0.3

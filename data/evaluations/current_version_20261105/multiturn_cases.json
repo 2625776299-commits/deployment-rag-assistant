@@ -1,0 +1,561 @@
+{
+  "schema_version": 1,
+  "suite_id": "current_multiturn_20261105_v1",
+  "dataset_role": "known_development_regression_not_holdout",
+  "status": "frozen_before_execution",
+  "execution_status": "not_executed",
+  "knowledge_build_id": "corpus-v4-openai-20261105T113923Z_3caf7a",
+  "generation_model": "gpt-6.1-sol",
+  "embedding_model": "text-embedding-3-large",
+  "source_suite": "data/evaluations/multiturn_development_v1.json",
+  "source_sha256": "2de1a685058c707d66bc7c8d719c7b54c08f73cdf1d40deaff6a23fc0e7a9438",
+  "model_input_allowlist": [
+    "current_user_message",
+    "authorized_task_catalog",
+    "relevant_dialogue",
+    "prepared_context",
+    "retrieved_evidence"
+  ],
+  "review_only_fields": [
+    "purpose",
+    "expected",
+    "must_not_claim",
+    "review_status",
+    "priority",
+    "known_profile_gap"
+  ],
+  "review_rules": [
+    "先保存用户消息及预期，再运行模型；预期与评审标签不发送给模型。",
+    "按每轮检查任务归属、本轮问题、上下文、控制动作和最终回答，不仅检查最后一句或HTTP状态码。",
+    "检索来源存在和引用合法不能代替判断结论是否适用于当前环境。",
+    "恢复、权限、重放等基础设施检查复用已有受控实验，不用重复真实模型调用替代它们。",
+    "本文件为待共同审核草稿，没有通过率或模型泛化能力结论。"
+  ],
+  "required_observations": [
+    "request_id",
+    "input_version",
+    "selected_task_id",
+    "task_goal",
+    "turn_question",
+    "context_changes_and_sources",
+    "frozen_context",
+    "build_id",
+    "retrieved_chunk_ids",
+    "coverage_and_action",
+    "public_answer_and_citations",
+    "provider_attempt_counts",
+    "elapsed_seconds"
+  ],
+  "cases": [
+    {
+      "case_id": "E01",
+      "purpose": "缺少现场信息时追问，补充后承接原问题",
+      "priority": "baseline",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用连接数据库失败，连接地址里的host和port应该怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "应用在宿主机，数据库在同一台机器的Compose容器里，服务名db，端口映射5433:5432。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M1",
+          "action": "needs_user",
+          "checks": [
+            "不猜测具体地址",
+            "索要决定host/port所需的部署信息"
+          ]
+        },
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "沿用原任务和连接地址问题",
+            "使用宿主机侧地址及发布端口5433",
+            "配置建议与故障根因分开"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "给出配置建议即证明连接失败原因已确定"
+      ],
+      "review_note": "Assistant reviewed existing scope and expected behavior; no user-independent authorship claim. Expected fields remain outside model input."
+    },
+    {
+      "case_id": "E02",
+      "purpose": "纠正同机关系为另一台宿主机，检验localhost是否被错误沿用",
+      "priority": "first_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用在宿主机上，数据库在同一台机器的Compose容器里，映射5433:5432。host和port怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "同一台机器这点我说错了：数据库在另一台服务器192.0.2.20的Compose容器中，映射还是5433:5432，应用还在原来的宿主机。现在只说明连接地址怎么配置。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "仍是同一排错任务",
+            "纠正数据库与应用的同机关系",
+            "保存用户明确提供的数据库宿主机地址",
+            "连接目标为192.0.2.20及其发布端口5433",
+            "不把地址配置正确等同于网络一定可达"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "应用继续通过自己的localhost访问另一台服务器的数据库",
+        "仅凭给定IP和映射即可确认数据库必然可连接"
+      ],
+      "review_note": "助手在运行前核对预期：按用户明确环境事实与对应连接规则判断；未知现场信息不能由文档补出，通用机制不依赖无关待澄清项。并非用户逐条标注。"
+    },
+    {
+      "case_id": "E03",
+      "purpose": "实际迁入同一个Compose网络，区分仍成立的映射事实与本轮适用的连接路径",
+      "priority": "joint_design_first",
+      "review_status": "user_annotation_reviewed_by_assistant",
+      "user_annotation": "应用位置改为容器，并记录它和数据库处于同一个Compose网络；保留数据库服务名db和5433:5432的端口映射；host填db，port填5432，因为现在是容器间通信，5433的映射仍然存在，但这次连接不使用它。",
+      "review_note": "用户三项判断正确。助手补充验收时核对同一任务的连续性、状态保留以及最终回答，不能仅凭回答中的db:5432判定状态保存也完整。",
+      "known_profile_gap": "基线字段登记有published_host_port，未独立登记container_port及网络关系。两轮基线回答正确，相关信息由turn_question承接。候选实现新增两字段并在新任务中保存了这些事实；详见case_results，未自动改写已有任务登记。",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用在宿主机，数据库在同机的Compose容器中，服务名db，映射5433:5432。当前应用host和port应该怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "应用已经迁入数据库所在的同一个Compose网络，也是容器。数据库服务名和端口映射都没改。现在应该怎么连？"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "沿用原排错任务",
+            "更新应用实际运行位置",
+            "保留未改动的数据库服务名及端口映射事实",
+            "保存或可靠承接同一Compose网络关系和容器端口5432",
+            "本轮使用服务名db及容器端口5432",
+            "不因连接路径变更就声称5433映射已经取消"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "继续将宿主机上的localhost:5433作为应用容器的数据库连接地址",
+        "数据库发布端口事实已失效或映射被删除",
+        "外部请求绝对不经过容器端口"
+      ]
+    },
+    {
+      "case_id": "E04",
+      "purpose": "已确认环境被质疑后暂停该值，并区分阻碍具体配置与不阻碍通用机制解释",
+      "priority": "first_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用在宿主机，数据库在同机Compose容器中，映射5433:5432，连接地址怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "应用的位置我现在不确定，之前说宿主机只是猜测；数据库的位置和映射确定没错。我这次实际该填什么host和port？"
+        },
+        {
+          "message_id": "M3",
+          "content": "位置暂时还没确认。先只解释一般情况下Compose服务名为什么能被同网络内的其他容器找到。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M2",
+          "action": "needs_user",
+          "checks": [
+            "应用位置转为待澄清",
+            "不再使用旧host值作为当前事实",
+            "只追问仍缺少的关键部署信息"
+          ]
+        },
+        {
+          "message_id": "M3",
+          "action": "answer",
+          "checks": [
+            "仍保留应用位置待澄清状态",
+            "本轮范围缩小为通用服务发现机制",
+            "有足够文档证据时回答通用机制，不要求先确认现场位置",
+            "条件说明不冒充当前部署事实"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "回答通用机制后自动把应用位置恢复为host或container"
+      ],
+      "review_note": "助手在运行前核对预期：按用户明确环境事实与对应连接规则判断；未知现场信息不能由文档补出，通用机制不依赖无关待澄清项。并非用户逐条标注。"
+    },
+    {
+      "case_id": "E05",
+      "purpose": "假设迁移与已实际迁移形成对照，避免将方案讨论写入当前状态",
+      "priority": "second_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "现在应用在宿主机，数据库在同机Compose容器里，服务名db，映射5433:5432。当前连接地址怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "我暂时还没迁移。如果以后把应用放进数据库所在的同一个Compose网络，连接地址会怎么变？"
+        },
+        {
+          "message_id": "M3",
+          "content": "那连接失败时，先应该检查哪些配置？只分析刚才的假设场景。"
+        },
+        {
+          "message_id": "M4",
+          "content": "先不讨论迁移方案了，回到当前实际部署，连接地址应该怎么填？"
+        },
+        {
+          "message_id": "M5",
+          "content": "刚才讨论的迁移方案只有一个。我现在已经按那个方案完成迁移，连接地址应该怎么填？"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M1",
+          "action": "answer",
+          "checks": [
+            "同机宿主机应用连接数据库使用localhost及发布端口5433"
+          ]
+        },
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "本轮为hypothetical",
+            "应用实际位置仍host",
+            "假设同一Compose网络下使用db:5432",
+            "假设不写入实际环境"
+          ]
+        },
+        {
+          "message_id": "M3",
+          "action": "answer",
+          "checks": [
+            "同一任务的新问题",
+            "继承已保存的假设和原来源",
+            "条件性给出优先配置检查，不声称查明实际故障"
+          ]
+        },
+        {
+          "message_id": "M4",
+          "action": "answer",
+          "checks": [
+            "范围切回current",
+            "当前应用仍host",
+            "使用同机地址及发布端口5433"
+          ]
+        },
+        {
+          "message_id": "M5",
+          "action": "answer",
+          "checks": [
+            "按唯一方案已实施的本轮确认可更新用户陈述",
+            "引用同任务被确认的历史假设",
+            "实际应用位置container且同Compose网络",
+            "使用db:5432",
+            "不声称独立核验或故障已解决"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "在用户尚未确认实际迁移的M2/M3/M4阶段声称应用已迁移",
+        "仅凭方案实施确认就声称已连通或故障已解决"
+      ],
+      "review_note": "Assistant reviewed; extends the original hypothesis pair with follow-up, return-to-current and unique-plan confirmation using the jointly designed rules. Not a claim that the user independently authored all cases."
+    },
+    {
+      "case_id": "E06",
+      "purpose": "两个环境讨论后返回旧任务，确保问题与环境分别按选中任务恢复",
+      "priority": "second_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "生产环境应用在宿主机，数据库在同机Compose容器里，服务名db，映射5433:5432。连接地址怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "另一个本地测试故障：应用和数据库都在同一个Compose网络的容器中，数据库服务名test-db。只解释应用怎么用服务名找到数据库。"
+        },
+        {
+          "message_id": "M3",
+          "content": "回到生产那边，还是刚才那个连接地址问题，按已经确认的信息继续说明。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "创建独立任务与环境范围",
+            "不把生产5433、host或db服务名挪入测试环境"
+          ]
+        },
+        {
+          "message_id": "M3",
+          "action": "answer",
+          "checks": [
+            "返回生产任务",
+            "承接生产任务最近的连接地址问题",
+            "恢复host及5433的当前事实",
+            "不沿用test-db或测试环境的容器位置"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "所有任务共享最后一次出现的应用位置或服务名"
+      ],
+      "review_note": "Assistant-reviewed task-return checks; expected labels are review-only and are not sent to any model."
+    },
+    {
+      "case_id": "E07",
+      "purpose": "诊断所需的现场信息明确不可取得时停止确定根因，不重复追问已不可提供的信息",
+      "priority": "second_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "升级之后应用连不上数据库，这次到底是不是密码错了？我还没拿到报错。"
+        },
+        {
+          "message_id": "M2",
+          "content": "报错和日志都已清理，其他故障时的现场信息也拿不到。我仍想确定这次是不是密码错误。"
+        },
+        {
+          "message_id": "M3",
+          "content": "继续判断刚才那次故障：现在能排除其他原因，认定就是密码错误吗？"
+        },
+        {
+          "message_id": "M4",
+          "content": "既然无法确认这次根因，那补充理解一个通用机制：数据库容器重建后，为什么服务名没变，旧连接仍可能失效？只解释原理，不再诊断刚才那次故障。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M1",
+          "action": "needs_user",
+          "checks": [
+            "不将密码猜测写成已确认根因",
+            "索要能区分原因的至多两类必要现场信息"
+          ]
+        },
+        {
+          "message_id": "M2",
+          "action": "insufficient",
+          "checks": [
+            "明确无法确认实际根因",
+            "不反复索要已明确不可取得的日志或历史现场信息",
+            "若缺口仅为不可取得的现场证据，不发起文档补检试图代替它",
+            "没有臆造数据库产品、错误码或密码配置"
+          ]
+        },
+        {
+          "message_id": "M3",
+          "action": "insufficient",
+          "checks": [
+            "承接同一故障及此前证据不可取得的限制",
+            "不能排除其他原因或认定密码错误",
+            "不重复追问不可得日志，不用文档补检代替历史现场证据"
+          ]
+        },
+        {
+          "message_id": "M4",
+          "action": "answer",
+          "checks": [
+            "通用服务发现与旧连接失效原理有文档支撑即可回答",
+            "不因为历史日志不可取得就一律拒答或追问",
+            "不能把通用机制写成此前真实故障的确定根因"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "文档列出了认证失败，因此本次必定是密码错误"
+      ],
+      "review_note": "Assistant-reviewed unavailable-incident-evidence scenario, extended to a follow-up and a general-mechanism contrast. Expected labels remain review-only, not model inputs."
+    },
+    {
+      "case_id": "E08",
+      "purpose": "用户只问地址/端口时保持回答范围，不从文档示例或默认端口推断数据库产品",
+      "priority": "second_batch",
+      "review_status": "assistant_reviewed",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用在宿主机，数据库在同机Compose容器里，映射15432:5432。只说明host和port怎么填。"
+        },
+        {
+          "message_id": "M2",
+          "content": "为什么这里要选15432而不是5432？我只想理解端口选择。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M1",
+          "action": "answer",
+          "checks": [
+            "说明宿主机地址与发布端口15432",
+            "使用产品无关的host/port说明"
+          ]
+        },
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "按宿主机访问容器服务的路径解释发布端口",
+            "区分连接配置与实际端口映射转发，避免绝对化网络表述",
+            "不增加数据库产品、驱动或无关连接串"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "仅凭5432认定用户使用PostgreSQL",
+        "未确认驱动时添加JDBC连接串",
+        "容器端口只允许容器之间的流量，外部流量绝对不会到达容器端口"
+      ],
+      "review_note": "Assistant reviewed existing scope and expected behavior; no user-independent authorship claim. Expected fields remain outside model input."
+    },
+    {
+      "case_id": "E03B",
+      "purpose": "将容器端口改成非默认6432，检验是否按用户事实取端口而非套用资料中的5432",
+      "priority": "first_batch",
+      "review_status": "assistant_reviewed",
+      "review_note": "助手根据E03中用户已确认的连接规则构造单条件变体；用户未逐条审核此变体。",
+      "known_profile_gap": "使用已新增container_port/network_relation的实现，观察非默认端口是否完整保留并被正确采用。",
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "应用在宿主机，数据库在同机的Compose容器中，服务名db，映射5433:6432。当前应用host和port应该怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "应用已经迁入数据库所在的同一个Compose网络，也是容器。数据库服务名和端口映射都没改。现在应该怎么连？"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "沿用原排错任务",
+            "更新应用实际运行位置",
+            "保留未改动的数据库服务名及端口映射事实",
+            "保存或可靠承接同一Compose网络关系和容器端口6432",
+            "本轮使用服务名db及容器端口6432",
+            "不因连接路径变更就声称5433映射已经取消"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "继续将宿主机上的localhost:5433作为应用容器的数据库连接地址",
+        "数据库发布端口事实已失效或映射被删除",
+        "外部请求绝对不经过容器端口",
+        "因官方资料示例写5432，就把用户明确给出的6432改成5432"
+      ],
+      "derived_from": {
+        "case_id": "E03",
+        "reviewed_rule": "同网容器间使用服务名与用户明确的容器端口，保留发布端口事实",
+        "changed_condition": "容器端口5432改为6432，发布端口5433保持不变"
+      }
+    },
+    {
+      "case_id": "E06H",
+      "purpose": "切换到独立测试任务后恢复生产任务的假设，再切回生产实际环境，检查范围与字段隔离",
+      "priority": "second_batch",
+      "review_status": "assistant_reviewed",
+      "derived_from": {
+        "case_id": "E06",
+        "change": "在生产任务中加入已保存的假设；测试任务使用不同服务名及非默认端口，再显式返回生产假设及实际。"
+      },
+      "turns": [
+        {
+          "message_id": "M1",
+          "content": "生产环境应用在宿主机，数据库在同机Compose容器里，服务名db，映射5433:5432。连接地址怎么填？"
+        },
+        {
+          "message_id": "M2",
+          "content": "我暂时还没迁移。假设以后把生产应用放进数据库所在的同一个Compose网络，连接地址怎么填？"
+        },
+        {
+          "message_id": "M3",
+          "content": "换一个独立的本地测试任务：应用和数据库都在同一个Compose网络的容器中，数据库服务名test-db，映射6543:15432。只解释测试应用如何用服务名找到数据库，不用说明连接端口。"
+        },
+        {
+          "message_id": "M4",
+          "content": "回到生产环境的任务，继续刚才假设迁移后的连接配置问题。"
+        },
+        {
+          "message_id": "M5",
+          "content": "现在先不讨论假设，继续说明生产环境当前实际部署的host和port应该怎么填。"
+        }
+      ],
+      "expected": [
+        {
+          "message_id": "M1",
+          "action": "answer",
+          "checks": [
+            "T1 current；生产实际应用host、db、5433:5432；localhost:5433"
+          ]
+        },
+        {
+          "message_id": "M2",
+          "action": "answer",
+          "checks": [
+            "仍T1，hypothetical；假设使用db:5432，实际环境不变"
+          ]
+        },
+        {
+          "message_id": "M3",
+          "action": "answer",
+          "checks": [
+            "新建独立T2及登记范围；T2 current",
+            "只使用test-db及测试范围字段，不混入生产db/5433"
+          ]
+        },
+        {
+          "message_id": "M4",
+          "action": "answer",
+          "checks": [
+            "返回T1并继承同任务M2假设和原来源",
+            "使用db:5432，不使用test-db或15432",
+            "T1实际应用仍host"
+          ]
+        },
+        {
+          "message_id": "M5",
+          "action": "answer",
+          "checks": [
+            "T1 current，使用生产实际localhost:5433",
+            "不继承测试container/test-db/6543/15432",
+            "T2实际状态完整保留，T1与T2长期目标不变"
+          ]
+        }
+      ],
+      "must_not_claim": [
+        "假设迁移已经发生",
+        "最近一个任务的环境可以作为其他任务当前环境",
+        "任务返回必须重新询问已经给出的生产部署信息"
+      ]
+    }
+  ]
+}

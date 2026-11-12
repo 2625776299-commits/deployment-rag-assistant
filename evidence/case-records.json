@@ -1,0 +1,172 @@
+{
+  "case_title": "部署排错 RAG 助手",
+  "author": "周曜宇",
+  "compiled_on": "2026-11-12",
+  "recorded_on": "2026-11-05",
+  "presentation": "已有记录展示；不在页面调用模型；未接入学校或课堂。",
+  "excerpt_policy": "用户原话与展示回答来自保存记录，仅将内部引用ID按来源顺序替换为数字编号。界面上的结论概述、状态中文标签为编辑说明。",
+  "contribution_scope": "本人参与场景拆解、需求与证据标注、关键设计取舍及结果分析；代码实现、测试脚本与部分逐题复核使用AI辅助。",
+  "turns": [
+    {
+      "message_id": "M1",
+      "title": "实际部署",
+      "user": "现在应用在宿主机，数据库在同机Compose容器里，服务名db，映射5433:5432。当前连接地址怎么填？",
+      "answer": "按你当前的部署，填写 host=localhost、port=5433，即 localhost:5433。应用从宿主机访问同机容器，应使用发布到宿主机的端口；流量再通过 5433:5432 映射到数据库容器的 5432 端口。db:5432 是同一 Compose 网络内服务间访问的用法，不是当前宿主机应用应填的地址。[1]",
+      "insight": "先明确应用在哪里运行。同机宿主机通过发布端口访问容器。",
+      "recorded_http_status": 200,
+      "recorded_status": "answer",
+      "input_version": 1,
+      "actual_application_location": "host",
+      "analysis_mode": "current",
+      "inherited_from_input_version": null,
+      "database_service": "db",
+      "published_host_port": "5433",
+      "container_port": "5432",
+      "source_links": [
+        "https://docs.docker.com/compose/how-tos/networking/"
+      ],
+      "preserved_assumption_source": []
+    },
+    {
+      "message_id": "M2",
+      "title": "提出假设",
+      "user": "我暂时还没迁移。如果以后把应用放进数据库所在的同一个Compose网络，连接地址会怎么变？",
+      "answer": "如果以后应用容器加入数据库所在的同一个 Compose 网络，且数据库服务名和端口保持不变，应用应配置为：\n- host=db\n- port=5432\n\n也就是连接 db:5432：同一 Compose 网络中的服务可通过服务名找到对方，服务间通信使用容器端口，而不是宿主机发布端口 5433。[1]\n\n这是迁移后的配置建议，不表示你现在已经完成迁移或验证连接成功。",
+      "insight": "“如果以后”是方案讨论。回答假设问题，同时保留实际环境。",
+      "recorded_http_status": 200,
+      "recorded_status": "answer",
+      "input_version": 2,
+      "actual_application_location": "host",
+      "analysis_mode": "hypothetical",
+      "inherited_from_input_version": null,
+      "database_service": "db",
+      "published_host_port": "5433",
+      "container_port": "5432",
+      "source_links": [
+        "https://docs.docker.com/compose/how-tos/networking/"
+      ],
+      "preserved_assumption_source": [
+        "M2",
+        "M2"
+      ]
+    },
+    {
+      "message_id": "M3",
+      "title": "承接假设",
+      "user": "那连接失败时，先应该检查哪些配置？只分析刚才的假设场景。",
+      "answer": "仅按“应用也放入数据库所在的同一个 Compose 网络”的假设，优先检查以下配置；这些是排查项，不代表已确认的故障原因。\n\n1. 应用连接地址：应配置 host=db、port=5432。同一 Compose 网络内通过服务名和容器端口连接；5433 是宿主机发布端口，不是这条容器间访问路径应填写的端口。[1]\n2. 网络归属与服务名：核对应用和数据库的网络配置是否确实满足“同一 Compose 网络”的假设，以及数据库服务名是否仍为 db。Compose 默认将服务接入默认网络，网络中的容器可通过服务名查找彼此。[1]\n3. 启动依赖与就绪检查：如果连接失败发生在启动阶段，检查数据库是否配置了合适的 healthcheck，以及应用对数据库的 depends_on 是否使用 condition: service_healthy。Compose 默认只等待容器运行，不保证数据库已经能接受连接；标记 service_healthy 才会等待依赖的健康检查通过。[2][3]\n\n以上配置建议尚未经过实际运行验证，不能据此认定失败一定由地址、网络或启动时序造成。",
+      "insight": "后续问题承接上一轮假设和来源，不自动变成实际部署事实。",
+      "recorded_http_status": 200,
+      "recorded_status": "answer",
+      "input_version": 3,
+      "actual_application_location": "host",
+      "analysis_mode": "hypothetical",
+      "inherited_from_input_version": 2,
+      "database_service": "db",
+      "published_host_port": "5433",
+      "container_port": "5432",
+      "source_links": [
+        "https://docs.docker.com/compose/how-tos/networking/",
+        "https://docs.docker.com/compose/how-tos/startup-order/",
+        "https://docs.docker.com/compose/how-tos/startup-order/"
+      ],
+      "preserved_assumption_source": [
+        "M2",
+        "M2"
+      ]
+    },
+    {
+      "message_id": "M4",
+      "title": "回到实际",
+      "user": "先不讨论迁移方案了，回到当前实际部署，连接地址应该怎么填？",
+      "answer": "按当前实际部署：应用运行在宿主机，数据库在同机 Compose 容器中，端口映射为 5433:5432，应填写：\nhost=localhost\nport=5433\n\n这是从宿主机通过发布端口访问数据库的路径，流量再转发到容器内的 5432；不是使用 Compose 网络内服务间连接的 db:5432。[1]",
+      "insight": "切回当前实际环境后，仍应使用原来的宿主机连接路径。",
+      "recorded_http_status": 200,
+      "recorded_status": "answer",
+      "input_version": 4,
+      "actual_application_location": "host",
+      "analysis_mode": "current",
+      "inherited_from_input_version": null,
+      "database_service": "db",
+      "published_host_port": "5433",
+      "container_port": "5432",
+      "source_links": [
+        "https://docs.docker.com/compose/how-tos/networking/"
+      ],
+      "preserved_assumption_source": []
+    },
+    {
+      "message_id": "M5",
+      "title": "确认变更",
+      "user": "刚才讨论的迁移方案只有一个。我现在已经按那个方案完成迁移，连接地址应该怎么填？",
+      "answer": "按你目前的部署情况，应用已在容器中，并与数据库处于同一个 Compose 网络，连接配置应填：\n- host：db\n- port：5432\n\n同一 Compose 网络内通过服务名连接，使用数据库的容器端口；宿主机发布端口 5433 不用于这条连接路径。[1]",
+      "insight": "用户明确确认实施后更新环境陈述，保留未变的服务名和端口。尚未核验现场连通性。",
+      "recorded_http_status": 200,
+      "recorded_status": "answer",
+      "input_version": 5,
+      "actual_application_location": "container",
+      "analysis_mode": "current",
+      "inherited_from_input_version": null,
+      "database_service": "db",
+      "published_host_port": "5433",
+      "container_port": "5432",
+      "source_links": [
+        "https://docs.docker.com/compose/how-tos/networking/"
+      ],
+      "preserved_assumption_source": []
+    }
+  ],
+  "comparison": {
+    "case_id": "TX02",
+    "question": "使用SQLAlchemy 2.0 Core的Connection，第一次conn.commit()已确认成功，连接仍正常有效，且没有执行任何新SQL或显式开启新事务。此时再次调用同一连接的conn.commit()会发生什么？会再次执行之前的SQL、产生重复写入或仅因重复调用而报错吗？",
+    "arms": {
+      "A_rrf_direct": {
+        "status": "insufficient",
+        "answer": "能确认的是：第一次 conn.commit() 成功后，原事务已结束；在没有执行新 SQL 或显式开启新事务的条件下，没有新的事务开始。资料说明，事务结束后 Connection 会等待下一次 execute() 才再次自动开启事务。[1]\n据此可以推论，第二次 commit() 不是重新执行之前 SQL 的操作，不能将其理解为重放先前写入。[1]\n但所给资料没有明确规定“无活动事务时调用 Connection.commit()”的具体行为，因此不足以严格确认它是否为空操作，以及是否不会仅因重复调用而报错。要完整回答这部分，需要 Connection.commit() 在无活动事务时的官方接口说明或对应实现依据。",
+        "selected_initial_ranks": [
+          1,
+          2,
+          3
+        ],
+        "pipeline_seconds": 9.055563,
+        "model_requests": 1,
+        "additional_retrievals": 0
+      },
+      "B_coverage_flow": {
+        "status": "answer",
+        "answer": "在你给定的条件下，第二次调用同一连接的 conn.commit() 没有效果（no-op）：不会再次执行之前的 SQL，不会产生重复写入，也不会仅因重复调用而报错。文档明确说明：连接未失效且没有已开启的事务时，Connection.commit() 不产生作用。[1]\n\n第一次 commit() 成功后，原事务已经结束；之后再次执行 SQL 才会触发自动开启事务（autobegin），也可以通过 Connection.begin() 显式开启事务。你已明确两者都没有发生，因此第二次 commit() 没有当前事务可提交。[2][1]",
+        "selected_initial_ranks": [
+          2,
+          5
+        ],
+        "pipeline_seconds": 25.506716,
+        "model_requests": 2,
+        "additional_retrievals": 0
+      }
+    },
+    "observation": "关键规则在初检第5位，B通过重选证据补全本题回答，未发生补检，同时增加调用与耗时。",
+    "reviewer": "AI助手按预先冻结的评分要点复核；非用户独立逐题评分或独立留出评测。",
+    "source_url": "https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Connection.commit"
+  },
+  "verification": {
+    "frozen_corpus_chunks": 53,
+    "paired_development_questions": 15,
+    "paired_executions": 30,
+    "multiturn_scenarios": 10,
+    "multiturn_turns": 30,
+    "state_source_replay_checks": 118,
+    "state_source_replay_checks_passed": true,
+    "postgresql_http_checks_passed": 90,
+    "scope": "固定开发样本和隔离测试，不以通过数量代表生产准确率；本次整理未重新运行模型。"
+  },
+  "user_contribution_examples": {
+    "E03_annotation": "应用位置改为容器，并记录它和数据库处于同一个Compose网络；保留数据库服务名db和5433:5432的端口映射；host填db，port填5432，因为现在是容器间通信，5433的映射仍然存在，但这次连接不使用它。",
+    "CP01_analysis": "旧连接失效解释来自初检第4位重新选证；pre_ping来自补检。单独验证补检时两组保持相同初始候选、评价器和选证策略，只有B允许补检。"
+  },
+  "known_limits": [
+    "小型语料与固定开发场景，尚无教育用户试用或学习效果数据。",
+    "TX01提交确认丢失问题仍有关键资料召回缺口，最终明确说明证据不足。",
+    "部分问题增加评价与补检后仍未完整覆盖；引用合法不能保证语义正确。",
+    "评价与补检增加模型请求和耗时；单题计时不能代表稳定性能。"
+  ]
+}
